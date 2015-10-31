@@ -1,25 +1,46 @@
 <?php
 
-require('settings.php');
+define('CONTRIB_PATH', __DIR__ . '/contrib/');
+define('CUSTOM_PATH', __DIR__ . '/custom/');
 
+require('settings.php');
 require('lib/database.php');
+
+require('lib/module.php');
+
+// Core Includes
 require('lib/header.php');
 require('lib/page.php');
 require('lib/footer.php');
+require('lib/error.php');
+
+// Contrib Includes
+$modules = glob(CONTRIB_PATH . '**/module.php');
+foreach($modules as $module) {
+    include($module);
+}
+
+// Custom Includes
+$modules = glob(CUSTOM_PATH . '**/module.php');
+foreach($modules as $module) {
+    include($module);
+}
 
 $url = $_GET['url'];
 
-if(substr($url, -1) != '/' && $url != '') {
+if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
     header('Location: ' . $url . '/');
 } else {
-    $dbconn = dbconnect();
+    $dbconn = \IceCreamCone\dbconnect();
 
-    $header = new Header($dbconn, $url);
-    $page = new Page($dbconn, $url);
-    $footer = new Footer($dbconn, $url);
+    $title = SITE_AUTHOR;
+
+    $header = new \IceCreamCone\Header($dbconn, $url, $title);
+    $page = new \IceCreamCone\Page($dbconn, $url, $title);
+    $footer = new \IceCreamCone\Footer($dbconn, $url, $title);
 
     $params = array(
-        'title' => 'Trevor Hall',
+        'title' => $title,
         'header' => $header,
         'content' => $page,
         'footer' => $footer

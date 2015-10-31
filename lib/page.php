@@ -1,67 +1,76 @@
 <?php
 
-require('error.php');
+namespace IceCreamCone;
 
-class Page {
+class Page extends Module {
     private $status = 500;
     
     private $url;
     private $page_id;
     private $type;
     private $content_id;
+    private $content;
     
-    public function __construct($dbconn, $url) {
+    public function __construct($dbconn, $url, $title) {
         $this->url = $url;
         
-        $stmt = $dbconn->prepare('SELECT page_id, type, content_id FROM Pages WHERE url = ?;');
+        $stmt = $dbconn->prepare('SELECT page_id, type, content_id FROM ' . DB_TABLE_PREFIX . 'pages WHERE url = ' . ($url == '' ? "''" : '?') . ';');
         if($stmt) {
-            $stmt->bind_param('s', $url);
+            if($url != '') {
+                $stmt->bind_param('s', $url);
+            }
             $stmt->execute();
+            $stmt->store_result();
             $stmt->bind_result($page_id, $type, $content_id);
             
             if($stmt->fetch()) {
-                $this->status = 200;
-                
                 $this->type = $type;
                 $this->page_id = $page_id;
                 
-                switch($type) {
-                    case 'blog':
-                        $this->get_blog($content_id);
-                        break;
-                    case 'article':
-                        $this->get_article($content_id);
-                        break;
-                    case 'project':
-                        $this->get_project($project_id);
-                        break;
+                $class = Module::module($type);
+                if($class != null) {
+                    try {
+                        $this->content = new $class($dbconn, $content_id);
+                        $this->status = 200;
+                    } catch(Exception $e) {
+                        error_log($e->getMessage());
+                    }
                 }
             } else {
                 $this->status = 404;
             }
             
             $stmt->close();
+        } else {
+            error_log($dbconn->error);
         }
     }
     
     public function html() {
         if($this->status == 200) {
             $params = array(
-                'type' => $type,
-                ''
+                'url' => $this->url,
+                'type' => $this->type,
+                'content' => $this->content
             );
-            include(THEME_PATH . 'page.tpl.php');
         } else {
-            http_status_code($this->status);
+            http_response_code($this->status);
             $page = new ErrorPage($this->status, $this->url);
-            $page->html();
+            $params = array(
+                'url' => $this->url,
+                'type' => $this->type,
+                'content' => $page
+            );
         }
+        include(THEME_PATH . 'page.tpl.php');
     }
     
     public function json() {
         if($this->status == 200) {
             $result = array(
-                
+                'url' => $this->url,
+                'type' => $this->type,
+                'content' => $this->content
             );
         } else {
             $result = array('error' => $this->status);

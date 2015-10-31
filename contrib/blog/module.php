@@ -1,6 +1,6 @@
 <?php
 
-class Blog {
+class Blog extends \IceCreamCone\Module {
     private $defined = false;
     
     private $byline;
@@ -8,7 +8,7 @@ class Blog {
     private $text;
     
     public function __construct($dbconn, $id) {
-        $stmt = $dbconn->prepare('SELECT title, byline, date, text FROM ' . DB_TABLE_PREFIX . 'Blogs WHERE blog_id = ?;');
+        $stmt = $dbconn->prepare('SELECT title, byline, date, text FROM ' . DB_TABLE_PREFIX . 'blogs WHERE blog_id = ?;');
         if($stmt) {
             $stmt->bind_param('i', $id);
             $stmt->execute();
@@ -35,7 +35,7 @@ class Blog {
                 'date' => $this->date,
                 'text' => $this->text
             );
-            include(ROOT_PATH . '/templates/blog.tpl.php');
+            include(__DIR__ . '/blog.tpl.php');
         } else {
             echo '<div class="post-failed"></div>';
         }
@@ -55,5 +55,7 @@ class Blog {
         return json_encode($result);
     }
 }
+
+Blog::register('blog');
 
 ?>
