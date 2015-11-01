@@ -4,7 +4,7 @@ $date = new DateTime($params['date']);
 $params['date'] = $date->format('M j, Y');
 
 ?>
-<div class="post">
+<div id="post-<?= $params['id']; ?>" class="post">
     <div class="post-header">
         <h2><?= $params['title']; ?></h2>
     </div>
