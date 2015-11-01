@@ -1,8 +1,6 @@
 <?php
-
 $date = new DateTime($params['date']);
 $params['date'] = $date->format('M j, Y');
-
 ?>
 <div id="post-<?= $params['id']; ?>" class="post">
     <div class="post-header">

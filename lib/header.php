@@ -60,7 +60,7 @@ class Header extends Module {
                 'url' => $this->url,
                 'links' => $this->links
             );
-            include(THEME_PATH . 'header.tpl.php');
+            include(THEME_PATH . 'core/header.tpl.php');
         }
     }
     

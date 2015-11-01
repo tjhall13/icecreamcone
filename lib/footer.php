@@ -16,7 +16,7 @@ class Footer extends Module {
             'url' => $this->url,
             'title' => $this->title
         );
-        include(THEME_PATH . 'footer.tpl.php');
+        include(THEME_PATH . 'core/footer.tpl.php');
     }
     
     public function json() {

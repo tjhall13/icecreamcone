@@ -16,7 +16,7 @@ class ErrorPage extends Module {
             'code' => $this->code,
             'url' => $this->url
         );
-        include(THEME_PATH . 'error.tpl.php');
+        include(THEME_PATH . 'core/error.tpl.php');
     }
     
     public function json() {

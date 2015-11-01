@@ -9,7 +9,16 @@ class Blog extends \IceCreamCone\Module {
     private $date;
     private $text;
     
+    private $path;
+    
     public function __construct($dbconn, $id) {
+        $path = THEME_PATH . 'contrib/blog.tpl.php';
+        if(file_exists($path)) {
+            $this->path = $path;
+        } else {
+            $this->path = __DIR__ . '/default.tpl.php';
+        }
+        
         $stmt = $dbconn->prepare('SELECT blogs.title, authors.name, blogs.date, blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON blogs.author_id = authors.author_id WHERE blog_id = ?;');
         if($stmt) {
             $stmt->bind_param('i', $id);
@@ -41,7 +50,7 @@ class Blog extends \IceCreamCone\Module {
                 'date' => $this->date,
                 'text' => $this->text
             );
-            include(__DIR__ . '/blog.tpl.php');
+            include($this->path);
         } else {
             echo '<div class="post-failed"></div>';
         }

@@ -62,7 +62,7 @@ class Page extends Module {
                 'content' => $page
             );
         }
-        include(THEME_PATH . 'page.tpl.php');
+        include(THEME_PATH . 'core/page.tpl.php');
     }
     
     public function json() {
