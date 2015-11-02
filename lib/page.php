@@ -11,13 +11,17 @@ class Page extends Module {
     private $content_id;
     private $content;
     
-    public function __construct($dbconn, $url, $title) {
+    public function __construct($url, $title) {
         $this->url = $url;
-        
-        $stmt = $dbconn->prepare('SELECT page_id, type, content_id FROM ' . DB_TABLE_PREFIX . 'pages WHERE url = ' . ($url == '' ? "''" : '?') . ';');
+        $this->title = $title;
+    }
+    
+    public function init($dbconn, $__ignore__, &$params = array()) {
+        $this->params = &$params;
+        $stmt = $dbconn->prepare('SELECT page_id, type, content_id FROM ' . DB_TABLE_PREFIX . 'pages WHERE url = ' . ($this->url == '' ? "''" : '?') . ';');
         if($stmt) {
-            if($url != '') {
-                $stmt->bind_param('s', $url);
+            if($this->url != '') {
+                $stmt->bind_param('s', $this->url);
             }
             $stmt->execute();
             $stmt->store_result();
@@ -30,7 +34,8 @@ class Page extends Module {
                 $class = Module::module($type);
                 if($class != null) {
                     try {
-                        $this->content = new $class($dbconn, $content_id);
+                        $this->content = new $class();
+                        $this->content->init($dbconn, $content_id, $params);
                         $this->status = 200;
                     } catch(Exception $e) {
                         error_log($e->getMessage());
@@ -46,7 +51,7 @@ class Page extends Module {
         }
     }
     
-    public function html() {
+    public function view() {
         if($this->status == 200) {
             $params = array(
                 'url' => $this->url,

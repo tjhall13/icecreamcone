@@ -11,7 +11,7 @@ class ErrorPage extends Module {
         $this->url = $url;
     }
     
-    public function html() {
+    public function view() {
         $params = array(
             'code' => $this->code,
             'url' => $this->url

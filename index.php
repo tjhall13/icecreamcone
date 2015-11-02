@@ -35,16 +35,20 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
 
     $title = SITE_AUTHOR;
 
-    $header = new \IceCreamCone\Header($dbconn, $url, $title);
-    $page = new \IceCreamCone\Page($dbconn, $url, $title);
-    $footer = new \IceCreamCone\Footer($dbconn, $url, $title);
-
+    $header = new \IceCreamCone\Header($url, $title);
+    $page = new \IceCreamCone\Page($url, $title);
+    $footer = new \IceCreamCone\Footer($url, $title);
+    
     $params = array(
         'title' => $title,
         'header' => $header,
         'content' => $page,
         'footer' => $footer
     );
+    $header->init($dbconn, 0, $params);
+    $page->init($dbconn, 0, $params);
+    $footer->init($dbconn, 0, $params);
+    
     include(THEME_PATH . 'core/html.tpl.php');
 
     $dbconn->close();

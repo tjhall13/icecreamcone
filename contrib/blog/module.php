@@ -3,7 +3,7 @@
 class Blog extends \IceCreamCone\Module {
     private $defined = false;
     
-    private $id;
+    private $blog_id;
     private $title;
     private $byline;
     private $date;
@@ -11,24 +11,27 @@ class Blog extends \IceCreamCone\Module {
     
     private $path;
     
-    public function __construct($dbconn, $id, $params = array()) {
+    public function __construct() {
         $path = THEME_PATH . 'contrib/blog.tpl.php';
         if(file_exists($path)) {
             $this->path = $path;
         } else {
             $this->path = __DIR__ . '/default.tpl.php';
         }
-        
+    }
+    
+    public function init($dbconn, $blog_id, &$params = array()) {
+        $this->params = &$params;
         $stmt = $dbconn->prepare('SELECT ' . DB_TABLE_PREFIX . 'blogs.title, ' . DB_TABLE_PREFIX . 'authors.name, ' . DB_TABLE_PREFIX . 'blogs.date, ' . DB_TABLE_PREFIX . 'blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON ' . DB_TABLE_PREFIX . 'blogs.author_id = ' . DB_TABLE_PREFIX . 'authors.author_id WHERE ' . DB_TABLE_PREFIX . 'blogs.blog_id = ?;');
         if($stmt) {
-            $stmt->bind_param('i', $id);
+            $stmt->bind_param('i', $blog_id);
             $stmt->execute();
             $stmt->bind_result($title, $byline, $date, $text);
             
             if($stmt->fetch()) {
                 $this->defined = true;
                 
-                $this->id = $id;
+                $this->blog_id = $blog_id;
                 $this->title = $title;
                 $this->byline = $byline;
                 $this->date = $date;
@@ -41,10 +44,10 @@ class Blog extends \IceCreamCone\Module {
         }
     }
     
-    public function html() {
+    public function view() {
         if($this->defined) {
             $params = array(
-                'id' => $this->id,
+                'id' => $this->blog_id,
                 'title' => $this->title,
                 'byline' => $this->byline,
                 'date' => $this->date,
@@ -59,7 +62,7 @@ class Blog extends \IceCreamCone\Module {
     public function json() {
         if($this->defined) {
             $result = array(
-                'id' => $this->id,
+                'id' => $this->blog_id,
                 'title' => $this->title,
                 'byline' => $this->byline,
                 'date' => $this->date,
@@ -72,7 +75,7 @@ class Blog extends \IceCreamCone\Module {
     }
     
     public function id() {
-        return $this->id;
+        return $this->blog_id;
     }
     
     public function title() {

@@ -1,7 +1,7 @@
 <div class="page-content">
     <div class="container">
         <?php
-        $params['content']->html();
+        $params['content']->view();
         ?>
     </div>
 </div>

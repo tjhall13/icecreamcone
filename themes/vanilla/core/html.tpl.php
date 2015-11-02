@@ -10,9 +10,9 @@
         <title><?= $params['title']; ?></title>
     </head>
     <body>
-        <?php $params['header']->html(); ?>
-        <?php $params['content']->html(); ?>
-        <?php $params['footer']->html(); ?>
+        <?php $params['header']->view(); ?>
+        <?php $params['content']->view(); ?>
+        <?php $params['footer']->view(); ?>
         
         <script src="<?= SITE_BASE ?>jquery/jquery-1.11.2.min.js"></script>
         <script src="<?= SITE_BASE ?>bootstrap/js/bootstrap.min.js"></script>

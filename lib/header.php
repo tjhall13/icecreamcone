@@ -42,9 +42,13 @@ class Header extends Module {
         }
     }
     
-    public function __construct($dbconn, $url, $title) {
-        $this->title = $title;
+    public function __construct($url, $title) {
         $this->url = $url;
+        $this->title = $title;
+    }
+    
+    public function init($dbconn, $__ignore__, &$params = array()) {
+        $this->params = &$params;
         try {
             $this->links = $this->resolve($dbconn, 0);
             $this->defined = true;
@@ -53,7 +57,7 @@ class Header extends Module {
         }
     }
     
-    public function html() {
+    public function view() {
         if($this->defined) {
             $params = array(
                 'title' => $this->title,
