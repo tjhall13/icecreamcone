@@ -62,7 +62,8 @@ class Header extends Module {
             $params = array(
                 'title' => $this->title,
                 'url' => $this->url,
-                'links' => $this->links
+                'links' => $this->links,
+                'user' => $_SESSION['name']
             );
             include(THEME_PATH . 'core/header.tpl.php');
         }

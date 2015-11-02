@@ -1,8 +1,5 @@
 <?php
 
-define('CONTRIB_PATH', __DIR__ . '/contrib/');
-define('CUSTOM_PATH', __DIR__ . '/custom/');
-
 require('settings.php');
 require('lib/database.php');
 
@@ -13,6 +10,9 @@ require('lib/header.php');
 require('lib/page.php');
 require('lib/footer.php');
 require('lib/error.php');
+
+define('CONTRIB_PATH', __DIR__ . '/contrib/');
+define('CUSTOM_PATH', __DIR__ . '/custom/');
 
 // Contrib Includes
 $modules = glob(CONTRIB_PATH . '**/module.php');
@@ -26,6 +26,7 @@ foreach($modules as $module) {
     include($module);
 }
 
+session_start();
 $url = $_GET['url'];
 
 if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
