@@ -8,7 +8,7 @@ abstract class Module {
         if(isset(self::$types[$type])) {
             return false;
         } else {
-            self::$types[$type] = static::class;
+            self::$types[$type] = get_called_class();
             return true;
         }
     }
