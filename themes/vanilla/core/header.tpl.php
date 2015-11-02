@@ -1,9 +1,18 @@
 <?php
 
+function test_url($str) {
+    return preg_match('/^[a-z]+:\/\/[^ ]+/', $str);
+}
+
 function print_links($links, $current) {
     foreach($links as $link) {
-        if(isset($link['url'])) { ?>
-            <li <?= strcmp($current, $link['url']) == 0 ? 'class="active"' : ''; ?>><a href="<?= $link['url']; ?>"><?= $link['name']; ?></a></li>
+        if(isset($link['url'])) { 
+            if(test_url($link['url'])) {
+                $url = $link['url'];
+            } else {
+                $url = SITE_BASE . $link['url'];
+            } ?>
+            <li <?= strcmp($current, $link['url']) == 0 ? 'class="active"' : ''; ?>><a href="<?= $url; ?>"><?= $link['name']; ?></a></li>
   <?php } else if(isset($link['links'])) { ?>
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?= $link['name']; ?><span class="caret"></span></a>
@@ -30,7 +39,7 @@ function print_links($links, $current) {
         <div class="collapse navbar-collapse" id="homepage-navbar">
             <ul class="nav navbar-nav">
                 <?php
-                    print_links($params['links'], '/' . $params['url']);
+                    print_links($params['links'], $params['url']);
                 ?>
             </ul>
         </div>

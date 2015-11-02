@@ -29,7 +29,7 @@ foreach($modules as $module) {
 $url = $_GET['url'];
 
 if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
-    header('Location: ' . $url . '/');
+    header('Location: ' . SITE_BASE . $url . '/');
 } else {
     $dbconn = \IceCreamCone\dbconnect();
 
@@ -45,7 +45,7 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
         'content' => $page,
         'footer' => $footer
     );
-    include(THEME_PATH . 'html.tpl.php');
+    include(THEME_PATH . 'core/html.tpl.php');
 
     $dbconn->close();
 }

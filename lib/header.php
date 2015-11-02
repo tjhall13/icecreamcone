@@ -9,7 +9,7 @@ class Header extends Module {
     private $links;
     
     private function resolve($dbconn, $link_id) {
-        $stmt = $dbconn->prepare('SELECT name, url, links.link_id FROM links JOIN (SELECT @r as _prev, @r := (SELECT link_id FROM links WHERE prev_id = _prev AND parent_id = ?) AS link_id FROM (SELECT @r := 0) vars, links) list ON links.link_id = list.link_id;');
+        $stmt = $dbconn->prepare('SELECT name, url, ' . DB_TABLE_PREFIX . 'links.link_id FROM ' . DB_TABLE_PREFIX . 'links JOIN (SELECT @r as _prev, @r := (SELECT link_id FROM ' . DB_TABLE_PREFIX . 'links WHERE prev_id = _prev AND parent_id = ?) AS link_id FROM (SELECT @r := 0) vars, ' . DB_TABLE_PREFIX . 'links) list ON ' . DB_TABLE_PREFIX . 'links.link_id = list.link_id;');
         if($stmt) {
             $list = null;
             $stmt->bind_param('i', $link_id);

@@ -11,7 +11,7 @@ class Blog extends \IceCreamCone\Module {
     
     private $path;
     
-    public function __construct($dbconn, $id) {
+    public function __construct($dbconn, $id, $params = array()) {
         $path = THEME_PATH . 'contrib/blog.tpl.php';
         if(file_exists($path)) {
             $this->path = $path;
@@ -19,7 +19,7 @@ class Blog extends \IceCreamCone\Module {
             $this->path = __DIR__ . '/default.tpl.php';
         }
         
-        $stmt = $dbconn->prepare('SELECT blogs.title, authors.name, blogs.date, blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON blogs.author_id = authors.author_id WHERE blog_id = ?;');
+        $stmt = $dbconn->prepare('SELECT ' . DB_TABLE_PREFIX . 'blogs.title, ' . DB_TABLE_PREFIX . 'authors.name, ' . DB_TABLE_PREFIX . 'blogs.date, ' . DB_TABLE_PREFIX . 'blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON ' . DB_TABLE_PREFIX . 'blogs.author_id = ' . DB_TABLE_PREFIX . 'authors.author_id WHERE ' . DB_TABLE_PREFIX . 'blogs.blog_id = ?;');
         if($stmt) {
             $stmt->bind_param('i', $id);
             $stmt->execute();
