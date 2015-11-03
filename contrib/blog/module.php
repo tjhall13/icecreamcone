@@ -8,6 +8,8 @@ class Blog extends \IceCreamCone\Module {
     private $byline;
     private $date;
     private $text;
+    private $user;
+    private $url;
     
     private $path;
     
@@ -18,10 +20,10 @@ class Blog extends \IceCreamCone\Module {
         } else {
             $this->path = __DIR__ . '/default.tpl.php';
         }
+        $this->url = '#';
     }
     
     public function init($dbconn, $blog_id, &$params = array()) {
-        $this->params = &$params;
         $stmt = $dbconn->prepare('SELECT ' . DB_TABLE_PREFIX . 'blogs.title, ' . DB_TABLE_PREFIX . 'authors.name, ' . DB_TABLE_PREFIX . 'blogs.date, ' . DB_TABLE_PREFIX . 'blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON ' . DB_TABLE_PREFIX . 'blogs.author_id = ' . DB_TABLE_PREFIX . 'authors.author_id WHERE ' . DB_TABLE_PREFIX . 'blogs.blog_id = ?;');
         if($stmt) {
             $stmt->bind_param('i', $blog_id);
@@ -36,12 +38,31 @@ class Blog extends \IceCreamCone\Module {
                 $this->byline = $byline;
                 $this->date = $date;
                 $this->text = $text;
+                $this->user = $params['user'];
+                
+                $params['title'] = $title;
             }
             
             $stmt->close();
         } else {
-            echo $dbconn->error;
+            error_log($dbconn->error);
         }
+        $stmt = $dbconn->prepare('SELECT url FROM ' . DB_TABLE_PREFIX . 'pages WHERE type = ? AND content_id = ?;');
+        if($stmt) {
+            $type = 'blog';
+            $stmt->bind_param('si', $type, $blog_id);
+            $stmt->execute();
+            $stmt->bind_result($url);
+            
+            if($stmt->fetch()) {
+                $this->url = SITE_BASE . $url;
+            }
+            
+            $stmt->close();
+        } else {
+            error_log($dbconn->error);
+        }
+        
     }
     
     public function view() {
@@ -51,7 +72,9 @@ class Blog extends \IceCreamCone\Module {
                 'title' => $this->title,
                 'byline' => $this->byline,
                 'date' => $this->date,
-                'text' => $this->text
+                'text' => $this->text,
+                'user' => $this->user,
+                'url' => $this->url
             );
             include($this->path);
         } else {
@@ -66,7 +89,8 @@ class Blog extends \IceCreamCone\Module {
                 'title' => $this->title,
                 'byline' => $this->byline,
                 'date' => $this->date,
-                'text' => $this->text
+                'text' => $this->text,
+                'url' => $this->url
             );
         } else {
             $result = array('error' => 'Unable to retrieve blog');
@@ -92,6 +116,10 @@ class Blog extends \IceCreamCone\Module {
     
     public function text() {
         return $this->text;
+    }
+    
+    public function url() {
+        return $this->url;
     }
 }
 

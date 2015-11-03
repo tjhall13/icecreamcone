@@ -40,8 +40,18 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
     $page = new \IceCreamCone\Page($url, $title);
     $footer = new \IceCreamCone\Footer($url, $title);
     
+    $user = null;
+    
+    if(isset($_SESSION['name']) && isset($_SESSION['id'])) {
+        $user = array(
+            'name' => $_SESSION['name'],
+            'id' => $_SESSION['id']
+        );
+    }
+    
     $params = array(
         'title' => $title,
+        'user' => $user,
         'header' => $header,
         'content' => $page,
         'footer' => $footer

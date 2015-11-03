@@ -5,11 +5,6 @@ header('Content-Type: application/json');
 require('settings.php');
 require('lib/database.php');
 
-$_POST = array(
-    'username' => 'trevor',
-    'password' => 'soccer13[husker'
-);
-
 $username = $_POST['username'];
 $password = $_POST['password'];
 

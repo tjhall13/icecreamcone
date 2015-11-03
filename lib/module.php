@@ -16,11 +16,7 @@ abstract class Module {
         return self::$types[$type];
     }
     
-    protected $params;
-    
-    public function init($dbconn, $content_id, &$params) {
-        $this->params = &$params;
-    }
+    public function init($dbconn, $content_id, &$params) { }
     
     abstract public function view();
     abstract public function json();

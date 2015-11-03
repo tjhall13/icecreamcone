@@ -1,5 +1,9 @@
 <?php
 
+if($params['user']) {
+    echo __FILE__;
+}
+
 ?>
 <html>
     <head>

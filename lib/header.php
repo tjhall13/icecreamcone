@@ -4,9 +4,10 @@ namespace IceCreamCone;
 
 class Header extends Module {
     private $defined = false;
-    private $title;
     private $url;
     private $links;
+    private $user;
+    private $title;
     
     private function resolve($dbconn, $link_id) {
         $stmt = $dbconn->prepare('SELECT name, url, ' . DB_TABLE_PREFIX . 'links.link_id FROM ' . DB_TABLE_PREFIX . 'links JOIN (SELECT @r as _prev, @r := (SELECT link_id FROM ' . DB_TABLE_PREFIX . 'links WHERE prev_id = _prev AND parent_id = ?) AS link_id FROM (SELECT @r := 0) vars, ' . DB_TABLE_PREFIX . 'links) list ON ' . DB_TABLE_PREFIX . 'links.link_id = list.link_id;');
@@ -48,9 +49,9 @@ class Header extends Module {
     }
     
     public function init($dbconn, $__ignore__, &$params = array()) {
-        $this->params = &$params;
         try {
             $this->links = $this->resolve($dbconn, 0);
+            $this->user = $params['user'];
             $this->defined = true;
         } catch(Exception $e) {
             $this->defined = false;
@@ -61,9 +62,9 @@ class Header extends Module {
         if($this->defined) {
             $params = array(
                 'title' => $this->title,
+                'user' => $this->user,
                 'url' => $this->url,
-                'links' => $this->links,
-                'user' => $_SESSION['name']
+                'links' => $this->links
             );
             include(THEME_PATH . 'core/header.tpl.php');
         }

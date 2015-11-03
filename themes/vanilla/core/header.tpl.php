@@ -44,6 +44,7 @@ function print_links($links, $current) {
             </ul>
             <ul class="nav navbar-nav navbar-right"><?php
                 if($params['user']) {
+                    echo '<li><a href="' . SITE_BASE . 'edit/">Edit <span class="glyphicon glyphicon-edit"></span></a></li>';
                     echo '<li><a href="' . SITE_BASE . 'logout.php" data-action="logout">Log Out <span class="glyphicon glyphicon-log-out"></span></a></li>';
                 } else {
                     echo '<li><a href="#" data-toggle="modal" data-target="#login">Log In <span class="glyphicon glyphicon-log-in"></span></a></li>';
