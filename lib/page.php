@@ -38,7 +38,8 @@ class Page extends Module {
                         $this->content = new $class();
                         $args = array(
                             'user' => $params['user'],
-                            'title' => &$params['title']
+                            'title' => &$params['title'],
+                            'editors' => &$params['editors']
                         );
                         $this->content->init($dbconn, $content_id, $args);
                         $this->status = 200;

@@ -54,7 +54,8 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
         'user' => $user,
         'header' => $header,
         'content' => $page,
-        'footer' => $footer
+        'footer' => $footer,
+        'editors' => array()
     );
     $header->init($dbconn, 0, $params);
     $page->init($dbconn, 0, $params);

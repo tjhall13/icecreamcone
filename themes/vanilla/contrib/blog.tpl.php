@@ -1,6 +1,5 @@
 <?php
-$date = new DateTime($params['date']);
-$params['date'] = $date->format('M j, Y');
+$date = (new DateTime($params['date']))->format('M j, Y');
 
 if($params['user']) { ?>
 <ul class="nav nav-tabs">
@@ -18,13 +17,27 @@ if($params['user']) { ?>
         <?= $params['text']; ?>
     </div>
     <div class="post-footer">
-        <h4><?= $params['date']; ?></h4>
+        <h4><?= $date; ?></h4>
     </div>
 </div> <?php
 if($params['user']) { ?>
     </div>
     <div id="edit-post-<?= $params['id']; ?>" class="tab-pane">
-        <h4>Edit</h4>
+        <form>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" name="title" value="<?= $params['title']; ?>">
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="text" class="form-control" name="date" value="<?= $params['date']; ?>">
+            </div>
+            <div class="form-group">
+                <label for="date">Text</label>
+                <?= $params['editor']; ?>
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">Save</button>
+        </form>
     </div>
 </div> <?php
 } ?>

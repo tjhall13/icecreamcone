@@ -1,10 +1,3 @@
-<?php
-
-if($params['user']) {
-    echo __FILE__;
-}
-
-?>
 <html>
     <head>
         <link rel="stylesheet" href="<?= SITE_BASE ?>bootstrap/css/bootstrap.min.css">
@@ -20,6 +13,14 @@ if($params['user']) {
         
         <script src="<?= SITE_BASE ?>jquery/jquery-1.11.2.min.js"></script>
         <script src="<?= SITE_BASE ?>bootstrap/js/bootstrap.min.js"></script>
-        <script src="<?= SITE_BASE ?>js/homepage.min.js"></script>
+        <script src="<?= SITE_BASE ?>js/homepage.min.js"></script><?php
+        if($params['user']) { ?>
+            <script src="<?= SITE_BASE ?>ckeditor/ckeditor.js"></script>
+            <script><?php
+            foreach($params['editors'] as $editor) {
+                echo "CKEDITOR.replace('$editor');";
+            } ?>
+            </script><?php
+        } ?>
     </body>
 </html>

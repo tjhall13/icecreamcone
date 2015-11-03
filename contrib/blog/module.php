@@ -10,6 +10,7 @@ class Blog extends \IceCreamCone\Module {
     private $text;
     private $user;
     private $url;
+    private $editor;
     
     private $path;
     
@@ -23,7 +24,7 @@ class Blog extends \IceCreamCone\Module {
         $this->url = '#';
     }
     
-    public function init($dbconn, $blog_id, &$params = array()) {
+    public function init($dbconn, $blog_id, &$params = array('editors' => array())) {
         $stmt = $dbconn->prepare('SELECT ' . DB_TABLE_PREFIX . 'blogs.title, ' . DB_TABLE_PREFIX . 'authors.name, ' . DB_TABLE_PREFIX . 'blogs.date, ' . DB_TABLE_PREFIX . 'blogs.text FROM ' . DB_TABLE_PREFIX . 'blogs LEFT JOIN ' . DB_TABLE_PREFIX . 'authors ON ' . DB_TABLE_PREFIX . 'blogs.author_id = ' . DB_TABLE_PREFIX . 'authors.author_id WHERE ' . DB_TABLE_PREFIX . 'blogs.blog_id = ?;');
         if($stmt) {
             $stmt->bind_param('i', $blog_id);
@@ -32,6 +33,7 @@ class Blog extends \IceCreamCone\Module {
             
             if($stmt->fetch()) {
                 $this->defined = true;
+                $html_id = 'edit-blog-' . $blog_id;
                 
                 $this->blog_id = $blog_id;
                 $this->title = $title;
@@ -39,7 +41,9 @@ class Blog extends \IceCreamCone\Module {
                 $this->date = $date;
                 $this->text = $text;
                 $this->user = $params['user'];
+                $this->editor = '<textarea id="' . $html_id . '" rows="20" cols="80">' . $text . '</textarea>';
                 
+                $params['editors'][] = $html_id;
                 $params['title'] = $title;
             }
             
@@ -74,7 +78,8 @@ class Blog extends \IceCreamCone\Module {
                 'date' => $this->date,
                 'text' => $this->text,
                 'user' => $this->user,
-                'url' => $this->url
+                'url' => $this->url,
+                'editor' => $this->editor
             );
             include($this->path);
         } else {
