@@ -14,7 +14,7 @@ define('CONTRIB_PATH', __DIR__ . '/contrib/');
 define('CUSTOM_PATH', __DIR__ . '/custom/');
 
 function handle_requests($dbconn, $data, $user_id) {
-    $dbconn->begin_transaction();
+    $dbconn->autocommit(false);
     foreach($data as $type => $requests) {
         foreach($requests as $request) {
             $module = null;
@@ -68,7 +68,6 @@ $data = json_decode($_POST['data']);
 session_start();
 if(isset($_SESSION['name']) && isset($_SESSION['id'])) {
     $dbconn = \IceCreamCone\dbconnect();
-    $dbconn->autocommit(false);
     $result = handle_requests($dbconn, $data, $_SESSION['id']);
     $dbconn->close();
 } else {
