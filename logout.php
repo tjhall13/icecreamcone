@@ -2,8 +2,9 @@
 
 header('Content-Type: application/json');
 
+session_start();
+setcookie('PHPSESSID', '', time() - 3600);
 session_destroy();
-setcookie('PHPSESSID', '');
 echo json_encode(array('success' => true));
 
 ?>
