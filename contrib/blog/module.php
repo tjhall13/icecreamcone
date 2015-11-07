@@ -69,40 +69,6 @@ class Blog extends \IceCreamCone\Module {
         
     }
     
-    public function view() {
-        if($this->defined) {
-            $params = array(
-                'id' => $this->blog_id,
-                'title' => $this->title,
-                'byline' => $this->byline,
-                'date' => $this->date,
-                'text' => $this->text,
-                'user' => $this->user,
-                'url' => $this->url,
-                'editor' => $this->editor
-            );
-            include($this->path);
-        } else {
-            echo '<div class="post-failed"></div>';
-        }
-    }
-    
-    public function json() {
-        if($this->defined) {
-            $result = array(
-                'id' => $this->blog_id,
-                'title' => $this->title,
-                'byline' => $this->byline,
-                'date' => $this->date,
-                'text' => $this->text,
-                'url' => $this->url
-            );
-        } else {
-            $result = array('error' => 'Unable to retrieve blog');
-        }
-        return json_encode($result);
-    }
-    
     public function id() {
         return $this->blog_id;
     }
@@ -125,6 +91,142 @@ class Blog extends \IceCreamCone\Module {
     
     public function url() {
         return $this->url;
+    }
+    
+    public function view() {
+        if($this->defined) {
+            $params = array(
+                'id' => $this->blog_id,
+                'title' => $this->title,
+                'byline' => $this->byline,
+                'date' => $this->date,
+                'text' => $this->text,
+                'user' => $this->user,
+                'url' => $this->url,
+                'editor' => $this->editor
+            );
+            include($this->path);
+        } else {
+            echo '<div class="post-failed"></div>';
+        }
+    }
+    
+    private function set($dbconn, $id, $params) {
+        $query = 'UPDATE ' . DB_TABLE_PREFIX . 'blogs SET ';
+        $args = array('');
+        $update = false;
+        
+        if(property_exists($params, 'title')) {
+            $query .= 'title = ?, ';
+            $args[0] .= 's';
+            $args[] = &$params->title;
+            $update = true;
+        }
+        
+        if(property_exists($params, 'date')) {
+            $query .= 'date = ?, ';
+            $args[0] .= 's';
+            $args[] = &$params->date;
+            $update = true;
+        }
+        
+        if(property_exists($params, 'author')) {
+            $query .= 'author_id = ?, ';
+            $args[0] .= 'i';
+            $args[] = &$params->author;
+            $update = true;
+        }
+        
+        if(property_exists($params, 'text')) {
+            $query .= 'text = ?, ';
+            $args[0] .= 's';
+            $args[] = &$params->text;
+            $update = true;
+        }
+        
+        if($update) {
+            $query = substr($query, 0, strlen($query) - 2) . ' WHERE blog_id = ?;';
+            $args[0] .= 'i';
+            $args[] = &$id;
+            
+            $stmt = $dbconn->prepare($query);
+            if($stmt) {
+                call_user_func_array(array($stmt, 'bind_param'), $args);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                throw new \Exception($dbconn->error);
+            }
+        }
+    }
+    
+    private function remove($dbconn, $id) {
+        $stmt = $dbconn->prepare('DELETE FROM ' . DB_TABLE_PREFIX . 'blogs WHERE blog_id = ?;');
+        if($stmt) {
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            throw new \Exception($dbconn->error);
+        }
+        
+        $stmt = $dbconn->prepare('DELETE FROM ' . DB_TABLE_PREFIX . 'pages WHERE content_id = ? AND type = ?;');
+        if($stmt) {
+            $type = 'blog';
+            $stmt->bind_param('is', $id, $type);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            throw new \Exception($dbconn->error);
+        }
+    }
+    
+    private function add($dbconn, $params) {
+        $title = $params->title;
+        $date = $params->date;
+        $text = $params->text;
+        $url = $params->url;
+        $author = $params->user_id;
+        
+        $stmt = $dbconn->prepare('INSERT INTO ' . DB_TABLE_PREFIX . 'blogs (title, date, text, author_id) VALUES (?, ?, ?, ?);');
+        if($stmt) {
+            $stmt->bind_param('sssi', $title, $date, $text, $author);
+            $stmt->execute();
+            
+            $type = 'blog';
+            $content_id = $dbconn->insert_id;
+            
+            $stmt->close();
+        } else {
+            throw new \Exception($dbconn->error);
+        }
+        
+        $stmt = $dbconn->prepare('INSERT INTO ' . DB_TABLE_PREFIX . 'pages (url, type, content_id) VALUES (?, ?, ?);');
+        if($stmt) {
+            $stmt->bind_param('ssi', $url, $type, $content_id);
+            if(!$stmt->execute()) {
+                $error = $stmt->error;
+                $stmt->close();
+                throw new \Exception($error);
+            }
+            $stmt->close();
+        } else {
+            throw new \Exception($dbconn->error);
+        }
+    }
+    
+    public function edit($dbconn, $method, $params) {
+        switch(0) {
+            case strcmp($method, 'add'):
+                $this->add($dbconn, $params);
+                break;
+            case strcmp($method, 'set'):
+                $this->set($dbconn, $params->id, $params);
+                break;
+            case strcmp($method, 'remove'):
+                $this->remove($dbconn, $params->id);
+                break;
+        }
     }
 }
 

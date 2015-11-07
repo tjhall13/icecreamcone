@@ -25,13 +25,7 @@ class ErrorPage extends Module {
         include(THEME_PATH . 'core/error.tpl.php');
     }
     
-    public function json() {
-        $result = array(
-            'code' => $this->code,
-            'url' => $this->url
-        );
-        return json_encode($result);
-    }
+    public function edit($dbconn, $method, $params) { }
 }
 
 ?>

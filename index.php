@@ -33,7 +33,6 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
     header('Location: ' . SITE_BASE . $url . '/');
 } else {
     $dbconn = \IceCreamCone\dbconnect();
-
     $title = SITE_AUTHOR;
 
     $header = new \IceCreamCone\Header($url, $title);
@@ -41,6 +40,7 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
     $footer = new \IceCreamCone\Footer($url, $title);
     
     $user = null;
+    $links = array();
     
     if(isset($_SESSION['name']) && isset($_SESSION['id'])) {
         $user = array(
@@ -49,9 +49,17 @@ if(strcmp($url, '') != 0 && strcmp(substr($url, -1), '/') != 0) {
         );
     }
     
+    try {
+        $links = \IceCreamCone\Header::links($dbconn);
+    } catch(Exception $e) {
+        error_log($e->getMessage());
+    }
+    
     $params = array(
         'title' => $title,
+        'links' => $links,
         'user' => $user,
+        'api' => SITE_BASE . 'api.php',
         'header' => $header,
         'content' => $page,
         'footer' => $footer,

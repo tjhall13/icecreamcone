@@ -6,22 +6,22 @@ function test_url($str) {
 
 function print_links($links, $current) {
     foreach($links as $link) {
-        if(isset($link['url'])) { 
-            if(test_url($link['url'])) {
-                $url = $link['url'];
-            } else {
-                $url = SITE_BASE . $link['url'];
-            } ?>
-            <li <?= strcmp($current, $link['url']) == 0 ? 'class="active"' : ''; ?>><a href="<?= $url; ?>"><?= $link['name']; ?></a></li>
-  <?php } else if(isset($link['links'])) { ?>
+        if(isset($link['links'])) { ?>
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?= $link['name']; ?><span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu"><?php
                     print_links($link['links'], $current);
                 ?>
                 </ul>
-            </li>
-  <?php }
+            </li><?php
+        } else {
+            if(test_url($link['url'])) {
+                $url = $link['url'];
+            } else {
+                $url = SITE_BASE . $link['url'];
+            } ?>
+            <li <?= strcmp($current, $link['url']) == 0 ? 'class="active"' : ''; ?>><a href="<?= $url; ?>"><?= $link['name']; ?></a></li><?php
+        }
     }
 }
 
@@ -43,9 +43,9 @@ function print_links($links, $current) {
             ?>
             </ul>
             <ul class="nav navbar-nav navbar-right"><?php
-                if($params['user']) {
-                    echo '<li><a href="' . SITE_BASE . 'edit/">Edit <span class="glyphicon glyphicon-edit"></span></a></li>';
-                    echo '<li><a href="' . SITE_BASE . 'logout.php" data-action="logout">Log Out <span class="glyphicon glyphicon-log-out"></span></a></li>';
+                if($params['user']) { ?>
+                    <li <?= strcmp($params['url'], 'manage/') == 0 ? 'class="active"' : ''; ?>><a href="<?= SITE_BASE . 'manage/'; ?>">Manage <span class="glyphicon glyphicon-wrench"></span></a></li>
+                    <li><a href="<?= SITE_BASE . 'logout.php'; ?>" data-action="logout">Log Out <span class="glyphicon glyphicon-log-out"></span></a></li><?php
                 } else {
                     echo '<li><a href="#" data-toggle="modal" data-target="#login">Log In <span class="glyphicon glyphicon-log-in"></span></a></li>';
                 } ?>

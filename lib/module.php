@@ -19,7 +19,7 @@ abstract class Module {
     public function init($dbconn, $content_id, &$params) { }
     
     abstract public function view();
-    abstract public function json();
+    abstract public function edit($dbconn, $method, $params);
 }
 
 ?>

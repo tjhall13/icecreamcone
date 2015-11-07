@@ -7,7 +7,7 @@ if($params['user']) { ?>
     <li><a href="#edit-post-<?= $params['id']; ?>" data-toggle="tab">Edit</a></li>
 </ul>
 <div class="tab-content">
-    <div id="view-post-<?= $params['id']; ?>" class="tab-pane active"> <?php
+    <div id="view-post-<?= $params['id']; ?>" class="tab-pane active"><?php
 } ?>
 <div id="post-<?= $params['id']; ?>" class="post">
     <div class="post-header">
@@ -19,11 +19,11 @@ if($params['user']) { ?>
     <div class="post-footer">
         <h4><?= $date; ?></h4>
     </div>
-</div> <?php
+</div><?php
 if($params['user']) { ?>
     </div>
     <div id="edit-post-<?= $params['id']; ?>" class="tab-pane">
-        <form>
+        <form class="post-editor" data-post="<?= $params['id']; ?>">
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" class="form-control" name="title" value="<?= $params['title']; ?>">
@@ -36,8 +36,11 @@ if($params['user']) { ?>
                 <label for="date">Text</label>
                 <?= $params['editor']; ?>
             </div>
-            <button type="submit" class="btn btn-primary pull-right">Save</button>
+            <div class="form-group">
+                <button class="btn btn-danger" data-action="remove">Delete</button>
+                <button class="btn btn-primary pull-right" data-action="save">Save</button>
+            </div>
         </form>
     </div>
-</div> <?php
+</div><?php
 } ?>

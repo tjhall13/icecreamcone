@@ -28,14 +28,7 @@ class Footer extends Module {
         include(THEME_PATH . 'core/footer.tpl.php');
     }
     
-    public function json() {
-        $result = array(
-            'url' => $this->url,
-            'title' => $this->title,
-            'author' => $this->author
-        );
-        return json_encode($result);
-    }
+    public function edit($dbconn, $method, $params) { }
 }
 
 ?>

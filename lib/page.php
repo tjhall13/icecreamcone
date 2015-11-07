@@ -38,13 +38,18 @@ class Page extends Module {
                         $this->content = new $class();
                         $args = array(
                             'user' => $params['user'],
+                            'links' => $params['links'],
                             'title' => &$params['title'],
                             'editors' => &$params['editors']
                         );
                         $this->content->init($dbconn, $content_id, $args);
                         $this->status = 200;
-                    } catch(Exception $e) {
-                        error_log($e->getMessage());
+                    } catch(\Exception $e) {
+                        if(strcmp($e->getMessage(), 'unauthorized') == 0) {
+                            $this->status = 401;
+                        } else {
+                            error_log($e->getMessage());
+                        }
                     }
                 }
             } else {
@@ -72,17 +77,86 @@ class Page extends Module {
         include(THEME_PATH . 'core/page.tpl.php');
     }
     
-    public function json() {
-        if($this->status == 200) {
-            $result = array(
-                'url' => $this->url,
-                'type' => $this->type,
-                'content' => $this->content
-            );
+    private function add($dbconn, $params) {
+        if(property_exists($params, 'url') && property_exists($params, 'type') && property_exists($params, 'content')) {
+            $stmt = $dbconn->prepare('INSERT INTO ' . DB_TABLE_PREFIX . 'pages (url, type, content_id) VALUES (?, ?, ?);');
+            if($stmt) {
+                $stmt->bind_param('ssi', $params->url, $params->type, $params->content);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                throw new \Excpetion($dbconn->error);
+            }
         } else {
-            $result = array('error' => $this->status);
+            throw new \Excpetion('Missing parameters');
         }
-        return json_encode($result);
+    }
+    
+    private function remove($dbconn, $id) {
+        $stmt = $dbconn->prepare('DELETE FROM ' . DB_TABLE_PREFIX . 'pages WHERE page_id = ?;');
+        if($stmt) {
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            throw new \Exception($dbconn->error);
+        }
+    }
+    
+    private function set($dbconn, $id, $params) {
+        $query = 'UPDATE ' . DB_TABLE_PREFIX . 'pages SET ';
+        $args = array('');
+        $update = false;
+        
+        if(property_exists($params, 'url')) {
+            $query .= 'url = ?, ';
+            $args[0] .= 's';
+            $args[] = &$params->url;
+            $update = true;
+        }
+        
+        if(property_exists($params, 'type')) {
+            $query .= 'type = ?, ';
+            $args[0] .= 's';
+            $args[] = &$params->type;
+            $update = true;
+        }
+        
+        if(property_exists($params, 'content')) {
+            $query .= 'content_id = ?, ';
+            $args[0] .= 'i';
+            $args[] = &$params->content;
+            $update = true;
+        }
+        
+        if($update) {
+            $query = substr($query, 0, strlen($query) - 2) . ' WHERE page_id = ?;';
+            $args[0] .= 'i';
+            $args[] = &$id;
+            
+            $stmt = $dbconn->prepare($query);
+            if($stmt) {
+                call_user_func_array(array($stmt, 'bind_param'), $args);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                throw new \Exception($dbconn->error);
+            }
+        }
+    }
+    
+    public function edit($dbconn, $method, $params) {
+        switch(0) {
+            case strcmp($method, 'add'):
+                $this->add($dbconn, $params);
+                break;
+            case strcmp($method, 'remove'):
+                $this->remove($dbconn, $params->id);
+                break;
+            case strcmp($method, 'set'):
+                $this->set($dbconn, $params->id, $params);
+                break;
+        }
     }
 }
 

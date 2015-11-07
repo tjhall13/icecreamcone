@@ -10,6 +10,14 @@
         <?php $params['header']->view(); ?>
         <?php $params['content']->view(); ?>
         <?php $params['footer']->view(); ?>
+<?php
+if($params['user']) { ?>
+        <script>
+        icecreamcone = {
+            <?= 'api: "' . $params['api'] . '"'; ?>
+        };
+        </script><?php
+} ?>
         
         <script src="<?= SITE_BASE ?>jquery/jquery-1.11.2.min.js"></script>
         <script src="<?= SITE_BASE ?>bootstrap/js/bootstrap.min.js"></script>
